@@ -1,0 +1,45 @@
+{
+    "name": "me-docstyle",
+    "description": "Documentation Style",
+    "version": "1.0.0",
+    "keywords": [
+        "me"
+    ],
+    "author": {
+        "name": "Embedthis Software",
+        "email": "dev@embedthis.com",
+        "url": "https://embedthis.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/embedthis/me-docstyle.git"
+    },
+    "bugs": {
+        "url": "http://github.com/embedthis/me-docstyle/issues"
+    },
+    "licenses": "MIT",
+    "dependencies": {
+        "exp-css": "~1",
+        "exp-js": "~1",
+        "exp-less": "~1",
+        "exp-reload": "~1",
+        "exp-html": "~1",
+        "exp-canon": "~1",
+        "jquery": "~3",
+        "semantic-ui": "~2"
+    },
+    "export": [
+        {
+            "from": [
+                "contents/",
+                "layouts/",
+                "partials/"
+            ],
+            "to": "${TOP}/"
+        }
+    ],
+    "manage": [
+        "expansive.json"
+    ],
+    "origin": "embedthis/me-docstyle"
+}
