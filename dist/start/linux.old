@@ -17,22 +17,6 @@
     <link href="../css/api.min.css" rel="stylesheet" type="text/css">
     
 
-    
-    <script>
-      var _paq = window._paq = window._paq || [];
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="https://embedthis.matomo.cloud/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '1']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src='//cdn.matomo.cloud/embedthis.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
-    
-
 </head>
 <body class="show-sidebar">
     <div class="sidebar">
@@ -195,6 +179,7 @@ goahead --help
     </div>
 
     <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/jquery/jquery.slim.min.js"></script>
     <script src="../lib/semantic-ui/semantic.min.js"></script>
     <script src="../scripts/sidebar.min.js"></script>
      
