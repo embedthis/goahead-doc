@@ -68,7 +68,7 @@
                 <div class="menu">
                     <a class="item" href="https://embedthis.com/blog/categories/GoAhead/">GoAhead News</a>
                     <a class="item" href="https://embedthis.com/goahead/">GoAhead Web Site</a>
-                    <a class="item" href="https://github.com/embedthis/goahead-doc/CHANGELOG.md"
+                    <a class="item" href="https://github.com/embedthis/goahead-doc/blob/main/CHANGELOG.md"
                         target="_blank">Release Change Log</a>
                     <a class="item" href="https://github.com/embedthis/goahead-doc">Project Code Repository</a>
                     <a class="item" href="https://github.com/embedthis/goahead-doc/issues/1">GoAhead Security Alerts</a>
