@@ -1,7 +1,9 @@
 /*
     expansive.es - Configuration for exp-js
 
-    Transform by minifying.
+    Process JavaScript files. This extension will render scripts and minify as required.
+    It can be used to extract inline scripts and onclick scripts into an external script file if using CSP.
+    It will also inline small scripts from external files.
  */
 Expansive.load({
 
@@ -10,9 +12,9 @@ Expansive.load({
         compress:   true,
         dotmin:     true,
         extract:    false,
-        files:      [ 'lib/**.js*', '!lib/**.json', '!lib**.map' ],
+        files:      [ ],
         minify:     false,
-        options:    '--mangle --compress dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=true'
+        options:    '--mangle --compress dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=true',
         usemap:     true,
         usemin:     true,
 
@@ -33,14 +35,18 @@ Expansive.load({
                     if (!(service.files is Array)) {
                         service.files = [ service.files ]
                     }
-                    expansive.control.collections.scripts =
-                        (expansive.control.collections.scripts + service.files).unique()
+                    for each (let file in service.files) {
+                        expansive.addItems('scripts', file)
+                    }
                 }
                 if (!service.extract) {
                     expansive.transforms['js-extract'].enable = false
                 }
             },
 
+            /*
+                Resolve the scripts taking account of .min and .map extensions
+             */
             resolve: function(path: Path, transform): Path? {
                 let service = transform.service
                 let vfile = directories.contents.join(path)
@@ -81,6 +87,9 @@ Expansive.load({
             },
 
         }, {
+            /*
+                Minify scripts not already minified
+             */
             name:       'minify',
             mappings:   'js',
 
@@ -127,11 +136,6 @@ Expansive.load({
 
         }, {
             name:  'render',
-
-            /*
-                Default to only scripts from packages under contents/lib
-                Required scripts may vary on a page by page basis.
-             */
             mappings: {
                 'js',
                 'min.js'
@@ -142,134 +146,112 @@ Expansive.load({
                 service.hash = {}
 
                 /*
-                    Render Scripts is based on 'collections.scripts' which defaults to 'lib/**.js' and is modified
-                    via expansive.json and addItems.
+                    Render Scripts is based on 'collections.scripts' 
                  */
                 global.renderScripts = function(filter = null, extras = []) {
                     let collections = expansive.collections
                     if (!collections.scripts && !expansive.scripts) {
                         return
                     }
-                    function buildScriptList(files: Array): Array {
-                        let directories = expansive.directories
+                    function mapScript(script): String {
+                        let contents = expansive.directories.contents
                         let service = expansive.services.js
-                        let scripts = []
-                        for each (script in files) {
-                            let before = script
-                            if ((script = expansive.getDestPath(script)) == null) {
-                                continue
+                        if (script.startsWith('http')) {
+                            return script
+                        }
+                        if ((script = expansive.getDestPath(script)) == null) {
+                            return script
+                        }
+                        let vfile = contents.join(script)
+                        let base = vfile.trimEnd('.min.js').trimEnd('.js')
+                        let map = base.joinExt('min.map', true).exists || base.joinExt('js.map', true).exists ||
+                            base.joinExt('.min.js.map', true).exists
+                        if (vfile.endsWith('min.js')) {
+                            if ((service.minify || service.usemin)) {
+                                return script
                             }
-                            let vfile = directories.contents.join(script)
-                            let base = vfile.trimEnd('.min.js').trimEnd('.js')
-                            let map = base.joinExt('min.map', true).exists || base.joinExt('js.map', true).exists ||
-                                base.joinExt('.min.js.map', true).exists
-                            if (vfile.endsWith('min.js')) {
-                                if ((service.minify || service.usemin) /* && (!service.usemap || map) */) {
-                                    scripts.push(script)
-                                }
-                            } else {
-                                let minified = vfile.replaceExt('min.js').exists
-                                let map = vfile.replaceExt('min.map').exists || vfile.replaceExt('js.map').exists ||
-                                    vfile.replaceExt('.min.js.map').exists
-                                if (service.minify || !minified || !(service.usemap && map)) {
-                                    if (service.minify && service.dotmin) {
-                                        scripts.push(script.replaceExt('min.js'))
-                                    } else {
-                                        scripts.push(script)
-                                    }
+                        } else {
+                            let minified = vfile.replaceExt('min.js').exists
+                            let map = vfile.replaceExt('min.map').exists || vfile.replaceExt('js.map').exists ||
+                                vfile.replaceExt('.min.js.map').exists
+                            if (service.minify || !minified || !(service.usemap && map)) {
+                                if (service.minify && service.dotmin) {
+                                    return script.replaceExt('min.js')
+                                } else {
+                                    return script
                                 }
                             }
                         }
-                        return scripts
+                        return script
                     }
 
                     /*
                         Pages have different scripts and so must compute script list per page.
                         This is hashed and saved.
                      */
-                    let directories = expansive.directories
+                    let contents = expansive.directories.contents
                     let service = expansive.services.js
-                    if (!service.hash[collections.scripts]) {
-                        let files = directories.contents.files(collections.scripts, {
-                            contents: true, directories: false, relative: true
-                        })
-                        files = expansive.orderFiles(files, "js")
-                        service.hash[collections.scripts] = buildScriptList(files).unique()
-                    }
-                    if (!service.hash[collections.async]) {
-                        let files = directories.contents.files(collections.async, {
-                            contents: true, directories: false, relative: true
-                        })
-                        files = expansive.orderFiles(files, "js")
-                        service.hash[collections.async] = buildScriptList(files).unique()
-                    }
-                    for each (script in service.hash[collections.scripts]) {
-                        if (filter && !Path(script).glob(filter)) {
-                            continue
-                        }
-                        let path = expansive.directories.contents.join(script)
-                        if (path.exists && !script.startsWith('http') && path.size < 5 * 1024) {
-                            write('\n<!--' + script + '-->\n' + '<script>\n' + path.readString() + '\n</script>\n')
-                        } else {
-                            script = Path(script).portable
-                            if (service.absolute) {
-                                if (!script.startsWith('http') && !script.startsWith('..')) {
-                                    script = '/' + script
-                                }
-                            } else {
-                                script = meta.top.join(script).trimStart('./')
-                            }
-                            write('<script src="' + script + '"></script>\n    ')
-                        }
-                    }
-                    for each (script in service.hash[collections.async]) {
-                        if (filter && !Path(script).glob(filter)) {
-                            continue
-                        }
-                        let path = expansive.directories.contents.join(script.replace(/\.min/, ''))
-                        if (path.exists && !script.startsWith('http') && path.size < 10 * 1024) {
-                            write('\n<!--' + script + '-->\n' + '<script defer>\n' + path.readString() + '\n</script>\n')
-                        } else {
-                            script = Path(script).portable
-                            if (service.absolute) {
-                                if (!script.startsWith('http') && !script.startsWith('..')) {
-                                    script = '/' + script
-                                }
-                            } else {
-                                script = meta.top.join(script).trimStart('./')
-                            }
-                            write('<script defer src="' + script + '"></script>\n    ')
-                        }
-                    }
 
+                    if (!service.hash[collections.scripts]) {
+                        let list = []
+                        for each (let item in collections.scripts) {
+                            let files = contents.files(item.item, {
+                                contents: true, directories: false, relative: true
+                            })
+                            if (files.length == 0) {
+                                files = [item.item]
+                            }
+                            for each (let file in files) {
+                                file = mapScript(file)
+                                if (file) {
+                                    list.push({item: file, modifiers: item.modifiers})
+                                }
+                            }
+                        }
+                        service.hash[collections.scripts] = list
+                    }
+                    for each (item in service.hash[collections.scripts]) {
+                        let script = item.item
+                        let modifiers = item.modifiers ? (' ' + item.modifiers) : ''
+
+                        if (filter && !Path(script).glob(filter)) {
+                            continue
+                        }
+                        //  Inline scripts (can't inline *.exp - as not rendered yet)
+                        let path = expansive.directories.contents.join(script)
+
+                        if (script.startsWith('http')) {
+                            //  External script file
+                            write('<script' + modifiers + ' src="' + script + '"></script>\n')
+                        } else {
+                            let target = Path(script).portable
+                            target = meta.top.join(target).trimStart('./')
+                            if (path.exists && !target.startsWith('http') && path.size < 5 * 1024) {
+                                let data = path.readString()
+                                //  Inline script data
+                                write('\n<!--' + script + '-->\n' + '<script' + modifiers + '>\n' + data + '\n</script>\n\n')
+                            } else {
+                                //  External script file
+                                write('<script' + modifiers + ' src="' + target + '"></script>\n')
+                            }
+                        }
+                    }
                     if (extras && extras is String) {
                         extras = [extras]
                     }
-                    //  DEPRECATED
-                    if (collections.remoteScripts) {
-                        extras = extras + collections.remoteScripts
-                    }
-                    if (service.states) {
-                        let extracted = service.states[meta.destPath]
+                    if (service.extractions) {
+                        let extracted = service.extractions[meta.destPath]
                         if (extracted && extracted.href) {
                             let jt = expansive.transforms.js
                             extras.push(jt.resolve(extracted.href, jt))
                         }
                     }
                     for each (script in extras) {
-                        let async = ''
-                        if (script.startsWith('async ')) {
-                            async = 'defer '
-                            script = script.split('async ')[1]
+                        if (!script.startsWith('http')) {
+                            let target = Path(script).portable
+                            script = meta.top.join(target).trimStart('./')
                         }
-                        if (service.absolute) {
-                            if (!script.startsWith('http') && !script.startsWith('..')) {
-                                script = '/' + script
-                            }
-                        } else {
-                            script = meta.top.join(script).trimStart('./')
-                        }
-                        write('<script ' + async + 'src="' + script + '"></script>\n    ')
+                        write('<script src="' + script + '"></script>\n    ')
                     }
                 }
             },
@@ -281,12 +263,15 @@ Expansive.load({
             },
 
         }, {
+            /*
+                For CSP -- extract inline script elements into an external script file
+             */
             name:       'extract',
             mappings:   'html',
 
             init: function(transform) {
                 transform.nextId = 0
-                transform.service.states = {}
+                transform.service.extractions = {}
             },
 
             render: function (contents, meta, transform) {
@@ -317,7 +302,7 @@ Expansive.load({
                 }
 
                 /*
-                    Local function to extract onclick attributes
+                    Extract onclick attributes
                  */
                 function handleScriptAttributes(contents, meta, state): String {
                     let result = ''
@@ -355,7 +340,7 @@ Expansive.load({
                 contents = handleScriptElements(contents, meta, state)
                 contents = handleScriptAttributes(contents, meta, state)
                 if (state.scripts || state.onclick) {
-                    let ss = service.states[meta.destPath] ||= {}
+                    let ss = service.extractions[meta.destPath] ||= {}
                     if (service.extract === true) {
                         ss.href = meta.destPath.replaceExt('js')
                     } else {
@@ -383,7 +368,7 @@ Expansive.load({
                 let perdoc = (service.extract === true)
                 let scripts = '/*\n    Inline scripts for \n */\n'
 
-                for (let [file, state] in service.states) {
+                for (let [file, state] in service.extractions) {
                     if (perdoc) {
                         scripts = '/*\n    Inline scripts for ' + file + '\n */\n'
                     }

@@ -14,7 +14,7 @@
 
             <p>Building via <em>make</em> is the simplest and quickest way to build. Use <em>make</em> if you want a default build or if you need to integrate GoAhead with an existing make-based build system.
                 <!--
-                Build with <a href="https://embedthis.com/makeme/">MakeMe</a> if you want to customize or configure the software for your system, or if you need to cross-compile for another operating system or architecture.
+                Build with <a href="https://www.embedthis.com/makeme/">MakeMe</a> if you want to customize or configure the software for your system, or if you need to cross-compile for another operating system or architecture.
                 -->
             Use the IDE projects for Visual Studio or Xcode if you are most comfortable with these tools and want a default build.</p>
 
@@ -23,13 +23,13 @@
             ->
 
             <a class="ui green large right labeled icon button"
-                href="https://embedthis.com/makeme/doc/source/">
+                href="https://www.embedthis.com/makeme/doc/source/">
                 <i class="right long arrow icon"></i>Building from Source
             </a>
 
             <a id="get"></a>
             <h2>Accessing the Source Code</h2>
-            <p>With each GoAhead release, a complete source code snapshot is provided. You can get the latest source code from the <a href="https://embedthis.com/goahead/download.html">download</a> site or you can access the <a href="https://github.com/embedthis/goahead">source code repository</a>.</p>
+            <p>With each GoAhead release, a complete source code snapshot is provided. You can get the latest source code from the <a href="https://www.embedthis.com/goahead/download.html">download</a> site or you can access the <a href="https://github.com/embedthis/goahead">source code repository</a>.</p>
 
             <a id="repository"></a>
             <h3>Source Repository</h3>

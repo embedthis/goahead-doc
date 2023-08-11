@@ -8,7 +8,7 @@ Expansive.load({
     services: {
         name:       'css',
         dotmin:     true,
-        files:      [ '**.css*', '!**.map', '!*.less*' ],
+        files:      [ '**.css*' ], // , '!**.map', '!*.less*' ],
         force:      false,
         extract:    false,
         minify:     false,
@@ -35,7 +35,9 @@ Expansive.load({
                         service.files = [ service.files ]
                     }
                     if (expansive.control.collections.styles.length == 0) {
-                        expansive.control.collections.styles = service.files
+                        for each (let file in service.files) {
+                            expansive.addItems('styles', file)
+                        }
                     }
                 }
                 if (!service.minify) {
@@ -115,7 +117,7 @@ Expansive.load({
                 if (less) {
                     contents = expansive.run(less + ' --compress - ', contents, meta)
                 } else {
-                    thrown new Error('Cannot find lessc')
+                    throw new Error('Cannot find lessc')
                 }
                 return contents
             }
@@ -131,72 +133,74 @@ Expansive.load({
                 service.hash = {}
 
                 /*
-                    Render styles is based on 'collections.styles' which defaults to '**.css' and is modified via expansive.json and addItems.
+                    Render styles is based on 'collections.styles'
                  */
                 global.renderStyles = function(filter = null, extras = []) {
                     let collections = expansive.collections
                     if (!collections.styles) {
                         return
                     }
-                    function buildStyleList(files: Array): Array {
-                        let directories = expansive.directories
+                    function mapSheet(style): String {
+                        let contents = expansive.directories.contents
                         let service = expansive.services.css
-                        let styles = []
-                        for each (style in files) {
-                            if ((style = expansive.getDestPath(style)) == null) {
-                                continue
-                            }
-                            let vfile = directories.contents.join(style)
-                            let base = vfile.trimEnd('.min.css').trimEnd('.css')
+                        if ((style = expansive.getDestPath(style)) == null) {
+                            return null
+                        }
+                        let vfile = contents.join(style)
+                        let base = vfile.trimEnd('.min.css').trimEnd('.css')
 
-                            let map = base.joinExt('min.map', true).exists || base.joinExt('css.map', true).exists ||
-                                base.joinExt('.min.css.map', true).exists
-                            if (vfile.endsWith('min.css')) {
-                                if (service.usemin && (!service.usemap || map)) {
-                                    styles.push(style)
-                                }
-                            } else {
-                                let minified = vfile.replaceExt('min.css').exists
-                                let map = vfile.replaceExt('min.map').exists || vfile.replaceExt('css.map').exists ||
-                                    vfile.replaceExt('.min.css.map').exists
-                                if ((service.minify && service.force) || !minified || !(service.usemap && map)) {
-                                    if (service.minify && service.dotmin) {
-                                        styles.push(style.replaceExt('min.css'))
-                                    } else {
-                                        styles.push(style)
-                                    }
+                        let map = base.joinExt('min.map', true).exists || base.joinExt('css.map', true).exists ||
+                            base.joinExt('.min.css.map', true).exists
+                        if (vfile.endsWith('min.css')) {
+                            if (service.usemin && (!service.usemap || map)) {
+                                return style
+                            }
+                        } else {
+                            let minified = vfile.replaceExt('min.css').exists
+                            let map = vfile.replaceExt('min.map').exists || vfile.replaceExt('css.map').exists ||
+                                vfile.replaceExt('.min.css.map').exists
+                            if ((service.minify && service.force) || !minified || !(service.usemap && map)) {
+                                if (service.minify && service.dotmin) {
+                                    return style.replaceExt('min.css')
+                                } else {
+                                    return style
                                 }
                             }
                         }
-                        return styles
+                        return null
                     }
-                    let directories = expansive.directories
-                    let service = expansive.services.css
+                    
                     /*
                         Pages have different stylesheets and so must compute style list per page.
                         This is hased and saved.
                      */
+                    let contents = expansive.directories.contents
+                    let service = expansive.services.css
                     if (!service.hash[collections.styles]) {
-                        let files = directories.contents.files(collections.styles,
-                            { contents: true, directories: false, relative: true})
-                        if (expansive.control.filters) {
-                            files = files.filter(function(e) { return e.glob(expansive.control.filters) })
+                        let list = []
+                        for each (let item in collections.styles) {
+                            let files = contents.files(item.item, { 
+                                contents: true, directories: false, relative: true
+                            })
+                            if (files.length == 0) {
+                                files = [item.item]
+                            }
+                            for each (let file in files) {
+                                file = mapSheet(file)
+                                if (file) {
+                                    list.push({item: file, modifiers: item.modifiers})
+                                }
+                            }
                         }
-                        files = expansive.orderFiles(files, "css")
-                        service.hash[collections.styles] = buildStyleList(files).unique()
+                        service.hash[collections.styles] = list
                     }
-                    for each (style in service.hash[collections.styles]) {
+                    for each (item in service.hash[collections.styles]) {
+                        let style = item.item
                         if (filter && !Path(style).glob(filter)) {
                             continue
                         }
-                        if (service.absolute) {
-                            if (!style.startsWith('http') && !style.startsWith('..')) {
-                                style = '/' + style
-                            }
-                        } else {
-                            style = meta.top.join(style).trimStart('./')
-                        }
-                        write('<link href="' + style + '" rel="stylesheet" type="text/css" />\n    ')
+                        let target = meta.top.join(style).trimStart('./')
+                        write('<link href="' + target + '" rel="stylesheet" type="text/css" />\n')
                     }
                     if (extras && extras is String) {
                         extras = [extras]
@@ -209,11 +213,7 @@ Expansive.load({
                         }
                     }
                     for each (style in extras) {
-                        if (service.absolute) {
-                            if (!style.startsWith('http') && !style.startsWith('..')) {
-                                style = '/' + style
-                            }
-                        } else {
+                        if (!style.startsWith('http')) {
                             style = meta.top.join(style).trimStart('./')
                         }
                         write('<link href="' + style + '" rel="stylesheet" type="text/css" />\n    ')

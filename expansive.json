@@ -1,6 +1,7 @@
 {
     "meta": {
-        "site": "https://embedthis.com/goahead/doc"
+        "site": "https://www.embedthis.com/goahead/doc",
+        "metrics": "goahead-doc"
     },
     "control": {
         "listen": ":7070"

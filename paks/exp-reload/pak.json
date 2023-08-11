@@ -11,9 +11,6 @@
         "type": "git",
         "url": "git://github.com/embedthis/exp-reload.git"
     },
-    "dependencies": {
-        "jquery": "~3"
-    },
     "devDependencies": {
         "expansive": ">=1.0.0",
         "pak": ">=1.0.0"

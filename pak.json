@@ -4,6 +4,7 @@
     "version": "5.2.1",
     "description": "GoAhead web server",
     "dependencies": {
+        "goahead": "~5.2",
         "me-docstyle": "~1"
     },
     "devDependencies": {
