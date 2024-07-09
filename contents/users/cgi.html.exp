@@ -27,7 +27,7 @@
             <p>When a URI is requested by a browser that includes the "<em>/cgi-bin/</em>" prefix, the 
             script name immediately after "/cgi-bin/" will be run. For example:</p>
 <pre class="ui code segment">
-http://www.embedthis.com/cgi-bin/cgitest
+https://www.embedthis.com/cgi-bin/cgitest
 </pre>
             <a name="invoking"></a>
             <h2 >Invoking CGI Programs</h2>

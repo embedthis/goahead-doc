@@ -1,11 +1,7 @@
 { title: "GoAhead FAQ", crumbs: [ { 'Getting Started': '../start/' }, ], }
 <h1>GoAhead&trade; FAQ</h1>
 <p>
-  If you don't find the answers you need here, please consult the
-  <a href="../developers/project.html">Project Resources</a> and perhaps submit
-  an issue/bug request on the
-  <a href="https://github.com/embedthis/goahead-doc/issues">GitHub repository</a
-  >.
+  If you don't find the answers you need here, please consult the product documentation.
 </p>
 
 <a id="questions"></a>
@@ -153,7 +149,7 @@
         <b>build</b> system and the target system that will <b>host</b> GoAhead.
         For example:
       </p>
-      <code>./configure --platform vxworks-arm</code>
+      <code>./configure --platform linux-arm</code>
       <p>
         When cross compiling, you also need to tell configure about your
         cross-compilation tool chain. This means the names of your compiler,
@@ -179,14 +175,4 @@
       </p>
     </div>
   </div>
-
-  <h2>Need more help?</h2>
-  <p>
-    If you have any further questions, please consult the
-    <a href="../developers/project.html">Project Resources</a> and perhaps
-    submit an issue/bug request on the
-    <a href="https://github.com/embedthis/goahead-doc/issues"
-      >GitHub repository</a
-    >.
-  </p>
 </div>

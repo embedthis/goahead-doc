@@ -13,7 +13,7 @@
             <p>Even the best application or HTTP server can experience some security vulnerabilities that are
             discovered after being deployed in the field. It is highly recommended that you stay up to date with the
             latest version of GoAhead.</p>
-            <p><a href="http://www.embedthis.com/">Embedthis</a> offers a Security Enhancement Service as part of an
+            <p><a href="https://www.embedthis.com/">Embedthis</a> offers a Security Enhancement Service as part of an
             GoAhead commercial license that will proactively notify you of any security flaws and will expedite fixes or
             workarounds to minimize the vulnerability.</p>
             

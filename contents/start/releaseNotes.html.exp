@@ -30,12 +30,15 @@
   source.
 </p>
 <ul>
-  <li>FreeBSD 1.X</li>
-  <li>Linux 2.6</li>
-  <li>MAC OS X 10.9 and later</li>
-  <li>VxWorks 6.X</li>
-  <li>Windows 7 and later</li>
+  <li>FreeBSD</li>
+  <li>Linux</li>
+  <li>MAC OS X</li>
 </ul>
+
+<p>GoAhead is supported directly on these platforms. </p>
+
+<p>GoAhead has been ported to other platforms including VxWorks and Windows. On these platforms, the core GoAhead software is supported only and not the entire integration with the O/S.</p>
+
 <p>
   The following CPU architectures are supported: arm, mips, ppc, xscale, x86,
   x64, sparc.

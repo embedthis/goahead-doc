@@ -26,10 +26,11 @@ System Requirements
 
 Operating System Support
 
-    * Windows Windows-7,8 (x86,x64)
     * Mac OS X 10.6+ (x64)
     * Linux 2.6 (x86,x64,arm,ppc,mips)
-    * VxWorks (x86,arm,ppc,mips)
+
+GoAhead is portable and has been ported to Vxworks and many other operating systems.
+Embedthis can provide porting guidance. Support is available to assist in this process.
 
 To install GoAhead, your development system will need at least the following:
 

@@ -70,8 +70,11 @@ openssl req -new -key server.key -out server.csr
             <a href="https://www.embedthis.com/pak/">Pak Package manager</a>.</p>
 
             <ul>
-                <li>MbedTLS &mdash; designed for embedded use. See
+                <li>MbedTLS &mdash; designed for embedded use. 
+                    <!--
+                    See
                     <a href="https://www.embedthis.com/catalog/#/?keywords=goahead-mbedtls">goahead-mbedtls</a>.
+                    -->
                     Integrated with GoAhead and enabled by default</em>.</li>
                 <li>OpenSSL &mdash; large and complete. Designed for enterprise use.
                     See <a href= "http://www.openssl.org">http://www.openssl.org</a>.</li>

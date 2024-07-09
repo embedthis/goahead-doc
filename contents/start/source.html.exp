@@ -64,27 +64,5 @@
 <p>
   With each GoAhead release, a complete source code snapshot is provided. You
   can get the latest source code from the
-  <a href="https://www.embedthis.com/goahead/download.html">download</a> site or
-  you can access the
-  <a href="https://github.com/embedthis/goahead">source code repository</a>.
-</p>
-
-<a id="repository"></a>
-<h3>Source Repository</h3>
-<p>
-  The GoAhead source code is hosted in a Git repository. We provide open
-  read-only access. Write access is available to regular contributing
-  developers. To check out the source use this command:
-</p>
-
-<pre class="ui code segment">
-$ git clone http://github.com/embedthis/goahead
-</pre>
-<p>
-  You can also view the repository at
-  <a href="https://github.com/embedthis/goahead"
-    >https://github.com/embedthis/goahead</a
-  >. This is also a convenient way to get the source code. Please use the
-  <em>master</em> branch for the most recent stable snapshot. For daily builds,
-  use the <em>dev</em> branch.
+  <a href="https://admin.embedthis.com">EmbedThis Builder</a> site.
 </p>

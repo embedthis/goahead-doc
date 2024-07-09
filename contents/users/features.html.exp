@@ -79,9 +79,7 @@
             <h3>Platform Support</h3>
             <ul>
                 <li>Linux (2.6)</li>
-                <li>Windows (7, 8)</li>
                 <li>MAC OSX (Lion)</li>
-                <li>VxWorks (6.x)</li>
                 <li>Free BSD</li>
                 <li>Unix</li>
                 <li>Easily ported to new platforms</li>

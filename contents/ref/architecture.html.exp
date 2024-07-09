@@ -256,9 +256,7 @@
 <h3>Secure Sockets</h3>
 <p>
   GoAhead supports the MbedTLS and OpenSSL stacks. You can configure both server
-  and/or client authentication of certificates. SSL and TLS are supported. Other
-  3rd party SSL stacks are also available via the
-  <a href="https://www.embedthis.com/catalog/">Pak online catalog</a>
+  and/or client authentication of certificates. SSL and TLS are supported. 
 </p>
 
 <h3>Authentication</h3>

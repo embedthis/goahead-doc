@@ -273,7 +273,6 @@ PUBLIC int websGetLogLevel(void);
 
 /**
     Set the current trace log level
-    @return Number between 0 and 9
     @ingroup Webs
     @stability Prototype
  */
@@ -593,7 +592,6 @@ PUBLIC void bufFlush(WebsBuf *bp);
 /**
     Free allocated storage for the buffer
     @param bp Buffer reference
-    @return Zero if successful
     @ingroup WebsBuf
     @stability Stable
  */
@@ -1108,7 +1106,6 @@ PUBLIC int socketConnect(cchar *host, int port, int flags);
     @param mask Mask of events of interest. Set to SOCKET_READABLE | SOCKET_WRITABLE | SOCKET_EXCEPTION.
     @param handler Socket handler function.
     @param arg Arbitrary object reference to pass to the SocketHandler callback function.
-    @return True if the address is an IPv6 address.
     @ingroup WebsSocket
     @stability Stable
  */
@@ -1740,7 +1737,6 @@ PUBLIC int websStartEvent(int delay, WebsEventProc proc, void *data);
 /**
     Stop an event
     @param id Event id allocated by websStartEvent
-    @return Integer handle index. Otherwise return -1 on allocation errors.
     @ingroup WebsRuntime
     @stability Stable
  */
@@ -2134,15 +2130,6 @@ PUBLIC void websCancelTimeout(Webs *wp);
     @stability Stable
  */
 PUBLIC int websCgiOpen(void);
-
-/**
-    CGI handler service callback
-    @param wp Webs object
-    @return Returns 1 if the request was handled.
-    @ingroup Webs
-    @stability Stable
- */
-PUBLIC int websCgiHandler(Webs *wp);
 
 /**
     Poll for output from CGI processes and output.
@@ -2859,7 +2846,6 @@ PUBLIC int websRedirectByStatus(Webs *wp, int status);
     @param wp Webs request object
     @param status HTTP status code.
     @param msg Response message body
-    @return Zero if successful, otherwise -1.
     @ingroup Webs
     @stability Stable
  */
@@ -2966,7 +2952,6 @@ PUBLIC void websSetBackgroundWriter(Webs *wp, WebsWriteProc proc);
     @param flags Set to WEBS_COOKIE_SECURE for https only. Set to WEBS_COOKIE_HTTP for http only.
         Otherwise the cookie applies to both http and https requests. Or in WEBS_COOKIE_SAME_LAX for SameSite=Lax
         and WEBS_COOKIE_SAME_STRICT for SameSite=Strict.
-    @return Zero if successful, otherwise -1.
     @ingroup Webs
     @stability Stable
  */
@@ -3392,7 +3377,6 @@ PUBLIC char *websReadPassword(cchar *prompt);
     @param wp Webs request object
     @param argc Count of function arguments
     @param argv Array of function arguments
-    @param defaultValue Default value to return if the variable is not defined
     @return Return zero if successful, otherwise -1.
     @ingroup Webs
     @stability Stable

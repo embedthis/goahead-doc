@@ -4,20 +4,25 @@
         { 'Reference Guide': '../ref/' },
     ],
 }
-            <h1>Memory Allocator</h1>
+            <h1>Memory Handling</h1>
             <a id="overview"></a>
-            <h2>Overview</h2>
-            <p>GoAhead provides an application-specific memory allocator to use instead of malloc. This allocator is 
+
+            <h2>Memory Notifier</h2>
+            <p> It is difficult and error-prone for programmers to always check the result of every API call that can possibly fail due to memory allocation errors. Calls such as strdup and asprintf are often assumed to succeed, but they can, and do fail when memory is depleted.</p>
+
+            <p>A better approach is to globally detect and handle memory allocation errors in one place. GoAhead handles memory allocation errors globally. When a GoAhead memory allocation fails, a memory notifier is invoked. The application can then determine what action to take. Typically, GoAhead will restart in such circumstances. The <b>websSetMemNotifier</b> call is used to define your own custom memory notifier. If you use the GoAhead APIs, the result of the memory allocations is checked and the notifier will be invoked before returning from the allocation call.</p>
+
+            <h2>Alternate Allocator</h2>
+            <p>GoAhead provides an alternate application-specific memory allocator to use instead of malloc. This allocator is 
             useful when the native operating system malloc suffers from excessive fragmentation.
-            It is faster than most general purpose malloc allocators for the GoAhead web server  workload. It is
-            deterministic and allocates and frees memory in constant time O(1). </p>
+            The GoAhead allocator is deterministic and allocates and frees memory in constant time O(1).</p>
             <p>The allocator is optimized for frequent allocations of small blocks (&lt; 4K). It 
             uses a scheme of buddy free queues for fast allocation. Memory allocations are aligned on 16 byte boundaries on
-            64-bit systems and otherwise on 8 byte boundaries. It will not return chunks of unused memory back to the O/S.</p>
+            64-bit systems and otherwise on 8 byte boundaries. It will not return chunks of unused memory back to the O/S and does
+            not otherwise coalesce memory.</p>
+        
             <a id="enabling"></a>
             <h3>Enabling the Allocator</h3>
-            <p>The allocator is not enabled by default as most operating systems now have suitable malloc implementations.
-            To enable, run configure and rebuild:</p>
-            <pre class="ui code segment">configure --set replaceMalloc=true
-me
-</pre>
+            <p>The allocator is not enabled by default as most operating systems now have better malloc implementations.
+            To enable, rebuild with:</p>
+            <pre class="ui code segment">ME_GOAHEAD_REPLACE_MALLOC=1 make</pre>
