@@ -4,6 +4,8 @@
     This module provides a portable cross-platform abstraction layer.
     By including "osdep.h", you will include most common O/S headers and define
     a set of useful cross-platform constants.
+
+    Copyright (c) All Rights Reserved. See details at the end of the file.
  */
 
 #ifndef _h_OSDEP
@@ -11,13 +13,18 @@
 
 /********************************** Includes **********************************/
 
-#include "me.h"
-
 /**
     Operating system dependent layer that provides a portable cross-platform abstraction layer.
-    @defgroup Osdep Osdep
     @stability Evolving
 */
+
+#ifndef OSDEP_USE_ME
+#define OSDEP_USE_ME 1
+#endif
+
+#if OSDEP_USE_ME
+#include "me.h"
+#endif
 
 /******************************* Default Features *****************************/
 /*
@@ -47,13 +54,15 @@
 #define ME_CPU_X86         4           /**< X86 */
 #define ME_CPU_X64         5           /**< AMD64 or EMT64 */
 #define ME_CPU_MIPS        6           /**< Mips */
-#define ME_CPU_PPC         7           /**< Power PC */
-#define ME_CPU_PPC64       8           /**< Power PC 64 */
-#define ME_CPU_SPARC       9           /**< Sparc */
-#define ME_CPU_TIDSP       10          /**< TI DSP */
-#define ME_CPU_SH          11          /**< SuperH */
-#define ME_CPU_RISCV       12          /**< RiscV */
-#define ME_CPU_RISCV64     13          /**< RiscV64 */
+#define ME_CPU_MIPS64      7           /**< Mips 64 */
+#define ME_CPU_PPC         8           /**< Power PC */
+#define ME_CPU_PPC64       9           /**< Power PC 64 */
+#define ME_CPU_SPARC       10          /**< Sparc */
+#define ME_CPU_TIDSP       11          /**< TI DSP */
+#define ME_CPU_SH          12          /**< SuperH */
+#define ME_CPU_RISCV       13          /**< RiscV */
+#define ME_CPU_RISCV64     14          /**< RiscV64 */
+#define ME_CPU_XTENSA      15          /**< Xtensa / ESP32 */
 
 /*
     Byte orderings
@@ -95,9 +104,14 @@
     #define ME_CPU_ARCH ME_CPU_ITANIUM
     #define CPU_ENDIAN ME_LITTLE_ENDIAN
 
-#elif defined(__mips__) || defined(__mips64)
+#elif defined(__mips__)
     #define ME_CPU "mips"
     #define ME_CPU_ARCH ME_CPU_MIPS
+    #define CPU_ENDIAN ME_BIG_ENDIAN
+
+#elif defined(__mips64)
+    #define ME_CPU "mips64"
+    #define ME_CPU_ARCH ME_CPU_MIPS64
     #define CPU_ENDIAN ME_BIG_ENDIAN
 
 #elif defined(__ppc__) || defined(__powerpc__) || defined(__ppc)
@@ -134,6 +148,11 @@
     #define ME_CPU "riscv64"
     #define ME_CPU_ARCH CPU_RISCV64
     #define ME_CPU_ENDIAN LITTLE_ENDIAN
+
+#elif defined(__XTENSA__)
+    #define ME_CPU "xtensa"
+    #define ME_CPU_ARCH CPU_XTENSA
+    #define ME_CPU_ENDIAN LITTLE_ENDIAN
 #else
     #error "Cannot determine CPU type in osdep.h"
 #endif
@@ -146,12 +165,13 @@
 #endif
 
 /*
-    Operating system defines. Use compiler standard defintions to sleuth. Works for all except VxWorks which does not
-    define any special symbol. NOTE: Support for SCOV Unix, LynxOS and UnixWare is deprecated.
+    Operating system defines. Use compiler standard defintions to sleuth. Works for all except 
+    VxWorks which does not define any special symbol (ugh). 
  */
 #if defined(__APPLE__)
     #define ME_OS "macosx"
     #define MACOSX 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
     #define ME_BSD_LIKE 1
@@ -161,28 +181,35 @@
 #elif defined(__linux__)
     #define ME_OS "linux"
     #define LINUX 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
+    #define PTHREADS 1
 
 #elif defined(__FreeBSD__)
     #define ME_OS "freebsd"
     #define FREEBSD 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
     #define ME_BSD_LIKE 1
     #define HAS_USHORT 1
     #define HAS_UINT 1
+    #define PTHREADS 1
 
 #elif defined(__OpenBSD__)
-    #define ME_OS "freebsd"
+    #define ME_OS "openbsd"
     #define OPENBSD 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
     #define ME_BSD_LIKE 1
+    #define PTHREADS 1
 
 #elif defined(_WIN32)
     #define ME_OS "windows"
     #define WINDOWS 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 0
     #define ME_WIN_LIKE 1
 
@@ -207,34 +234,43 @@
 #elif defined(__bsdi__)
     #define ME_OS "bsdi"
     #define BSDI 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
     #define ME_BSD_LIKE 1
+    #define PTHREADS 1
 
 #elif defined(__NetBSD__)
     #define ME_OS "netbsd"
     #define NETBSD 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
     #define ME_BSD_LIKE 1
+    #define PTHREADS 1
 
 #elif defined(__QNX__)
     #define ME_OS "qnx"
     #define QNX 0
     #define ME_UNIX_LIKE 0
     #define ME_WIN_LIKE 0
+    #define PTHREADS 1
 
 #elif defined(__hpux)
     #define ME_OS "hpux"
     #define HPUX 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
+    #define PTHREADS 1
 
 #elif defined(_AIX)
     #define ME_OS "aix"
     #define AIX 1
+    #define POSIX 1
     #define ME_UNIX_LIKE 1
     #define ME_WIN_LIKE 0
+    #define PTHREADS 1
 
 #elif defined(__CYGWIN__)
     #define ME_OS "cygwin"
@@ -251,6 +287,7 @@
 #elif defined(VXWORKS)
     /* VxWorks does not have a pre-defined symbol */
     #define ME_OS "vxworks"
+    #define POSIX 1
     #define ME_UNIX_LIKE 0
     #define ME_WIN_LIKE 0
     #define HAS_USHORT 1
@@ -258,6 +295,7 @@
 #elif defined(ECOS)
     /* ECOS may not have a pre-defined symbol */
     #define ME_OS "ecos"
+    #define POSIX 1
     #define ME_UNIX_LIKE 0
     #define ME_WIN_LIKE 0
 
@@ -267,6 +305,34 @@
     #define ME_WIN_LIKE 0
     #define HAS_INT32 1
 
+#elif defined(ESP_PLATFORM)
+    #define ME_OS "freertos"
+    #define FREERTOS 1
+    #define ESP32 1
+    #define POSIX 1
+    #define ME_UNIX_LIKE 0
+    #define ME_WIN_LIKE 0
+    #define PLATFORM "esp"
+    #define PTHREADS 1
+    #define HAS_INT32 1
+
+#elif defined(INC_FREERTOS_H) || defined(FREERTOS_CONFIG_H)
+    #define ME_OS "freertos"
+    #define FREERTOS 1
+    #define POSIX 1
+    #define ME_UNIX_LIKE 0
+    #define ME_WIN_LIKE 0
+    #define PTHREADS 1
+    #define HAS_INT32 1
+
+#elif defined(ARDUINO)
+    #define ME_OS "freertos"
+    #define FREERTOS 1
+    #define POSIX 1
+    #define ME_UNIX_LIKE 0
+    #define ME_WIN_LIKE 0
+    #define PTHREADS 1
+    #define HAS_INT32 1
 #endif
 
 #if __WORDSIZE == 64 || __amd64 || __x86_64 || __x86_64__ || _WIN64 || __mips64 || __arch64__ || __arm64__ || __aarch64__
@@ -359,6 +425,7 @@
     #include    <process.h>
     #include    <windows.h>
     #include    <shlobj.h>
+    #include    <malloc.h>
     #if _MSC_VER >= 1800
         #include    <stdbool.h>
     #endif
@@ -525,17 +592,58 @@
     #include   <stdatomic.h>
 #endif
 
+#if FREERTOS
+    #include <stddef.h>
+    #include <string.h>
+    #include "time.h"
+#if ESP32
+    #include "freertos/FreeRTOS.h"
+    #include "freertos/event_groups.h"
+    #include "freertos/task.h"
+#else
+    #include "FreeRTOS.h"
+    #include "event_groups.h"
+    #include "task.h"
+#endif /* ESP32 */
+#endif
+
+#if ESP32
+    #include "esp_system.h"
+    #include "esp_log.h"
+    #include "esp_heap_caps.h"
+    #include "esp_err.h"
+    #include "esp_event.h"
+    #include "esp_log.h"
+    #include "esp_system.h"
+    #include "esp_heap_caps.h"
+    #include "esp_psram.h"
+    #include "esp_pthread.h"
+    #include "esp_littlefs.h"
+    #include "esp_crt_bundle.h"
+    #include "esp_pthread.h"
+    #include "esp_wifi.h"
+    #include "esp_netif.h"
+    #include "nvs_flash.h"
+    #include "lwip/err.h"
+    #include "lwip/sockets.h"
+    #include "lwip/sys.h"
+    #include "lwip/netdb.h"
+#endif
+
+#if PTHREADS
+    #include <pthread.h>
+#endif
+
 /************************************** Types *********************************/
 /*
     Standard types
  */
 #ifndef HAS_BOOL
     #ifndef __cplusplus
-        #if !MACOSX
+        #if !MACOSX && !FREERTOS
             #define HAS_BOOL 1
             /**
                 Boolean data type.
-                @ingroup Osdep
                 @stability Stable
              */
             #if !WINDOWS || ((_MSC_VER < 1800) && !defined(bool))
@@ -550,7 +658,6 @@
     #define HAS_UCHAR 1
     /**
         Unsigned char data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned char uchar;
@@ -560,7 +667,6 @@
     #define HAS_SCHAR 1
     /**
         Signed char data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef signed char schar;
@@ -570,7 +676,6 @@
     #define HAS_CCHAR 1
     /**
         Constant char data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef const char cchar;
@@ -580,7 +685,6 @@
     #define HAS_CUCHAR 1
     /**
         Unsigned char data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef const unsigned char cuchar;
@@ -590,7 +694,6 @@
     #define HAS_USHORT 1
     /**
         Unsigned short data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned short ushort;
@@ -600,7 +703,6 @@
     #define HAS_CUSHORT 1
     /**
         Constant unsigned short data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef const unsigned short cushort;
@@ -610,7 +712,6 @@
     #define HAS_CVOID 1
     /**
         Constant void data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef const void cvoid;
@@ -620,7 +721,6 @@
     #define HAS_INT8 1
     /**
         Integer 8 bits data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef char int8;
@@ -630,7 +730,6 @@
     #define HAS_UINT8 1
     /**
         Unsigned integer 8 bits data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned char uint8;
@@ -640,7 +739,6 @@
     #define HAS_INT16 1
     /**
         Integer 16 bits data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef short int16;
@@ -650,7 +748,6 @@
     #define HAS_UINT16 1
     /**
         Unsigned integer 16 bits data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned short uint16;
@@ -660,7 +757,6 @@
     #define HAS_INT32 1
     /**
         Integer 32 bits data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef int int32;
@@ -670,7 +766,6 @@
     #define HAS_UINT32 1
     /**
         Unsigned integer 32 bits data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned int uint32;
@@ -680,7 +775,6 @@
     #define HAS_UINT 1
     /**
         Unsigned integer (machine dependent bit size) data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned int uint;
@@ -690,7 +784,6 @@
     #define HAS_ULONG 1
     /**
         Unsigned long (machine dependent bit size) data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef unsigned long ulong;
@@ -700,7 +793,6 @@
     #define HAS_CINT 1
     /**
         Constant int data type.
-        @ingroup Osdep
         @stability Stable
      */
     typedef const int cint;
@@ -711,21 +803,18 @@
     #if ME_UNIX_LIKE || VXWORKS || DOXYGEN
         /**
             Signed integer size field large enough to hold a pointer offset.
-            @ingroup Osdep
             @stability Stable
          */
         typedef ssize_t ssize;
-    #elif TIDSP
-        typedef int ssize_t;
-        typedef ssize_t ssize;
-    #else
+    #elif ME_WIN_LIKE
         typedef SSIZE_T ssize;
+    #else
+        typedef ssize_t ssize;
     #endif
 #endif
 
 /**
     Windows uses uint for write/read counts (Ugh!)
-    @ingroup Osdep
     @stability Stable
  */
 #if ME_WIN_LIKE
@@ -740,7 +829,6 @@
     #elif VXWORKS || DOXYGEN
         /**
             Integer 64 bit data type.
-            @ingroup Osdep
             @stability Stable
          */
         typedef long long int int64;
@@ -765,7 +853,6 @@
 
 /**
     Signed file offset data type. Supports large files greater than 4GB in size on all systems.
-    @ingroup Osdep
     @stability Stable
  */
 typedef int64 Offset;
@@ -773,7 +860,6 @@ typedef int64 Offset;
 #if DOXYGEN
     /**
         Size to hold the length of a socket address
-        @ingroup Osdep
         @stability Stable
      */
     typedef int Socklen;
@@ -786,7 +872,6 @@ typedef int64 Offset;
 #if DOXYGEN || ME_UNIX_LIKE || VXWORKS
     /**
         Argument for sockets
-        @ingroup Osdep
         @stability Stable
     */
     typedef int Socket;
@@ -814,21 +899,18 @@ typedef int64 Offset;
 
 /**
     Time in milliseconds since Jan 1, 1970.
-    @ingroup Osdep
     @stability Stable
 */
 typedef int64 Time;
 
 /**
     Elapsed time data type. Stores time in milliseconds from some arbitrary start epoch.
-    @ingroup Osdep
     @stability Stable
  */
 typedef int64 Ticks;
 
 /**
     Time/Ticks units per second (milliseconds)
-    @ingroup Osdep
     @stability Stable
  */
 #define TPS 1000
@@ -1049,27 +1131,52 @@ typedef int64 Ticks;
         maxPath: 4096
     }
  */
-#ifndef ME_MAX_FNAME
-    #define ME_MAX_FNAME        256         /**< Reasonable filename size */
-#endif
-#ifndef ME_MAX_PATH
-    #define ME_MAX_PATH         1024        /**< Reasonable filename size */
-#endif
-#ifndef ME_BUFSIZE
-    #define ME_BUFSIZE          8192        /**< Reasonable size for buffers */
-#endif
-#ifndef ME_MAX_BUFFER
-    #define ME_MAX_BUFFER       ME_BUFSIZE  /* DEPRECATE */
-#endif
+#if ESP32 || FREERTOS || VXWORKS
+    //  Microcontrollers and smaller systems
+    #ifndef ME_MAX_FNAME
+        #define ME_MAX_FNAME        128         /**< Reasonable max filename size */
+    #endif
+    #ifndef ME_MAX_PATH
+        #define ME_MAX_PATH         256        /**< Reasonable max path size */
+    #endif
+    #ifndef ME_BUFSIZE
+        #define ME_BUFSIZE          1024        /**< Reasonable size for buffers */
+    #endif
+    #ifndef ME_MAX_BUFFER
+        #define ME_MAX_BUFFER       ME_BUFSIZE  /* DEPRECATE */
+    #endif
+    #ifndef ME_MAX_ARGC
+        #define ME_MAX_ARGC         16          /**< Maximum number of command line args if using MAIN()*/
+    #endif
+    #ifndef ME_DOUBLE_BUFFER
+        #define ME_DOUBLE_BUFFER    (DBL_MANT_DIG - DBL_MIN_EXP + 4)
+    #endif
+    #ifndef ME_MAX_IP
+        #define ME_MAX_IP           128
+    #endif
+#else
+    #ifndef ME_MAX_FNAME
+        #define ME_MAX_FNAME        256         /**< Reasonable filename size */
+    #endif
+    #ifndef ME_MAX_PATH
+        #define ME_MAX_PATH         1024        /**< Reasonable path size */
+    #endif
+    #ifndef ME_BUFSIZE
+        #define ME_BUFSIZE          4096        /**< Reasonable size for buffers */
+    #endif
+    #ifndef ME_MAX_BUFFER
+        #define ME_MAX_BUFFER       ME_BUFSIZE  /* DEPRECATE */
+    #endif
 
-#ifndef ME_MAX_ARGC
-    #define ME_MAX_ARGC         32          /**< Maximum number of command line args if using MAIN()*/
-#endif
-#ifndef ME_DOUBLE_BUFFER
-    #define ME_DOUBLE_BUFFER    (DBL_MANT_DIG - DBL_MIN_EXP + 4)
-#endif
-#ifndef ME_MAX_IP
-    #define ME_MAX_IP           1024
+    #ifndef ME_MAX_ARGC
+        #define ME_MAX_ARGC         32          /**< Maximum number of command line args if using MAIN()*/
+    #endif
+    #ifndef ME_DOUBLE_BUFFER
+        #define ME_DOUBLE_BUFFER    (DBL_MANT_DIG - DBL_MIN_EXP + 4)
+    #endif
+    #ifndef ME_MAX_IP
+        #define ME_MAX_IP           1024
+    #endif
 #endif
 
 
@@ -1085,7 +1192,7 @@ typedef int64 Ticks;
         No MMU, so the stack size actually consumes memory. Set this as low as possible.
         NOTE: php and ejs use stack heavily.
     */
-    #define ME_STACK_SIZE    (128 * 1024)    /**< Default thread stack size (0 means use system default) */
+    #define ME_STACK_SIZE    (32 * 1024)    /**< Default thread stack size (0 means use system default) */
 #endif
 #endif
 
@@ -1360,6 +1467,15 @@ typedef int64 Ticks;
 
 #ifndef NBBY
     #define NBBY 8
+#endif
+
+#if FREERTOS
+#if !ESP32
+    typedef unsigned int socklen_t;
+#endif
+#ifndef SOMAXCONN
+    #define SOMAXCONN 5
+#endif
 #endif
 
 /*********************************** Externs **********************************/

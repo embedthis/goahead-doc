@@ -2132,6 +2132,15 @@ PUBLIC void websCancelTimeout(Webs *wp);
 PUBLIC int websCgiOpen(void);
 
 /**
+    CGI handler service callback
+    @param wp Webs object
+    @return Returns 1 if the request was handled.
+    @ingroup Webs
+    @stability Stable
+ */
+PUBLIC int websCgiHandler(Webs *wp);
+
+/**
     Poll for output from CGI processes and output.
     @return Time delay till next poll
     @ingroup Webs

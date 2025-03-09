@@ -149,7 +149,7 @@
             <h2>Memory Notifier</h2>
             <p> It is difficult and error-prone for programmers to always check the result of every API call that can possibly fail due to memory allocation errors. Calls such as strdup and asprintf are often assumed to succeed, but they can, and do fail when memory is depleted.</p>
 
-            <p>A better approach is to globally detect and handle memory allocation errors in one place. GoAhead handles memory allocation errors globally. When a memory allocation fails, a memory notifier is invoked. The application can then determine what action to take. Typically, GoAhead will restart in such circumstances. The <b>websSetMemNotifier</b> call is used to define your own custom memory notifier.</p>
+            <p>A better approach is to globally detect and handle memory allocation errors in one place. GoAhead handles memory allocation errors globally. When a GoAhead memory allocation fails, a memory notifier is invoked. The application can then determine what action to take. Typically, GoAhead will restart in such circumstances. The <b>websSetMemNotifier</b> call is used to define your own custom memory notifier. If you use the GoAhead APIs, the result of the memory allocations is checked and the notifier will be invoked before returning from the allocation call.</p>
 
             <h2>Alternate Allocator</h2>
             <p>GoAhead provides an alternate application-specific memory allocator to use instead of malloc. This allocator is 
